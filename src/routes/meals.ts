@@ -1,93 +1,135 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { db } from '../db/knex'
-import { ensureAuth } from '../plugins/auth'
-import { randomUUID } from 'crypto'
-
-function longestOnDietStreak(rows: Array<{ occurred_at: Date; is_on_diet: boolean }>) {
-  // Ordena por data/hora crescente
-  const sorted = [...rows].sort(
-    (a, b) => new Date(a.occurred_at).getTime() - new Date(b.occurred_at).getTime()
-  )
-  let best = 0
-  let current = 0
-  for (const r of sorted) {
-    if (r.is_on_diet) {
-      current += 1
-      if (current > best) best = current
-    } else {
-      current = 0
-    }
-  }
-  return best
-}
+import { checkSessionIdExists } from '../middlewares/check-session-id-exists'
+import { randomUUID } from 'node:crypto'
+import { knex } from '../database'
 
 export async function mealsRoutes(app: FastifyInstance) {
-  // Cria refeição
-  app.post('/', { preHandler: [ensureAuth] }, async (request, reply) => {
-    const bodySchema = z.object({
-      name: z.string().min(1),
-      description: z.string().default(''),
-      occurredAt: z.coerce.date(),
+  app.post('/', { preHandler: [checkSessionIdExists] }, async (request, reply) => {
+    const createMealBodySchema = z.object({
+      name: z.string(),
+      description: z.string(),
       isOnDiet: z.boolean(),
+      date: z.coerce.date(),
     })
 
-    const { name, description, occurredAt, isOnDiet } = bodySchema.parse(request.body)
-    const userId = (request.user as any).sub as string
+    const { name, description, isOnDiet, date } = createMealBodySchema.parse(request.body)
 
-    await db('meals').insert({
+    await knex('meals').insert({
       id: randomUUID(),
-      user_id: userId,
       name,
       description,
-      occurred_at: occurredAt,
       is_on_diet: isOnDiet,
+      date: date.getTime(),
+      user_id: request.user?.id,
     })
 
     return reply.status(201).send()
   })
 
-  // Lista todas as refeições do usuário
-  app.get('/', { preHandler: [ensureAuth] }, async (request) => {
-    const userId = (request.user as any).sub as string
-    const meals = await db('meals')
-      .select(
-        'id',
-        'name',
-        'description',
-        'occurred_at as occurredAt',
-        'is_on_diet as isOnDiet',
-        'created_at as createdAt',
-        'updated_at as updatedAt'
-      )
-      .where({ user_id: userId })
-      .orderBy('occurred_at', 'desc')
+  app.get('/', { preHandler: [checkSessionIdExists] }, async (request, reply) => {
+    const meals = await knex('meals').where({ user_id: request.user?.id }).orderBy('date', 'desc')
 
-    return { meals }
+    return reply.send({ meals })
   })
 
-  // Obtém uma refeição específica
-  app.get('/:id', { preHandler: [ensureAuth] }, async (request, reply) => {
-    const paramsSchema = z.object({ id: z.string().uuid() })
-    const { id } = paramsSchema.parse(request.params)
-    const userId = (request.user as any).sub as string
+  app.get('/:mealId', { preHandler: [checkSessionIdExists] }, async (request, reply) => {
+    const paramsSchema = z.object({ mealId: z.string().uuid() })
 
-    const meal = await db('meals')
-      .select(
-        'id',
-        'name',
-        'description',
-        'occurred_at as occurredAt',
-        'is_on_diet as isOnDiet',
-        'created_at as createdAt',
-        'updated_at as updatedAt'
-      )
-      .where({ id, user_id: userId })
+    const { mealId } = paramsSchema.parse(request.params)
+
+    const meal = await knex('meals').where({ id: mealId }).first()
+
+    if (!meal) {
+      return reply.status(404).send({ error: 'Meal not found' })
+    }
+
+    return reply.send({ meal })
+  })
+
+  app.put('/:mealId', { preHandler: [checkSessionIdExists] }, async (request, reply) => {
+    const paramsSchema = z.object({ mealId: z.string().uuid() })
+
+    const { mealId } = paramsSchema.parse(request.params)
+
+    const updateMealBodySchema = z.object({
+      name: z.string(),
+      description: z.string(),
+      isOnDiet: z.boolean(),
+      date: z.coerce.date(),
+    })
+
+    const { name, description, isOnDiet, date } = updateMealBodySchema.parse(request.body)
+
+    const meal = await knex('meals').where({ id: mealId }).first()
+
+    if (!meal) {
+      return reply.status(404).send({ error: 'Meal not found' })
+    }
+
+    await knex('meals').where({ id: mealId }).update({
+      name,
+      description,
+      is_on_diet: isOnDiet,
+      date: date.getTime(),
+    })
+
+    return reply.status(204).send()
+  })
+
+  app.delete('/:mealId', { preHandler: [checkSessionIdExists] }, async (request, reply) => {
+    const paramsSchema = z.object({ mealId: z.string().uuid() })
+
+    const { mealId } = paramsSchema.parse(request.params)
+
+    const meal = await knex('meals').where({ id: mealId }).first()
+
+    if (!meal) {
+      return reply.status(404).send({ error: 'Meal not found' })
+    }
+
+    await knex('meals').where({ id: mealId }).delete()
+
+    return reply.status(204).send()
+  })
+
+  app.get('/metrics', { preHandler: [checkSessionIdExists] }, async (request, reply) => {
+    const totalMealsOnDiet = await knex('meals')
+      .where({ user_id: request.user?.id, is_on_diet: true })
+      .count('id', { as: 'total' })
       .first()
 
-    if (!meal) return reply.status(404).send({ message: 'Meal not found' })
-    return { meal }
+    const totalMealsOffDiet = await knex('meals')
+      .where({ user_id: request.user?.id, is_on_diet: false })
+      .count('id', { as: 'total' })
+      .first()
+
+    const totalMeals = await knex('meals')
+      .where({ user_id: request.user?.id })
+      .orderBy('date', 'desc')
+
+    const { bestOnDietSequence } = totalMeals.reduce(
+      (acc, meal) => {
+        if (meal.is_on_diet) {
+          acc.currentSequence += 1
+        } else {
+          acc.currentSequence = 0
+        }
+
+        if (acc.currentSequence > acc.bestOnDietSequence) {
+          acc.bestOnDietSequence = acc.currentSequence
+        }
+
+        return acc
+      },
+      { bestOnDietSequence: 0, currentSequence: 0 }
+    )
+
+    return reply.send({
+      totalMeals: totalMeals.length,
+      totalMealsOnDiet: totalMealsOnDiet?.total,
+      totalMealsOffDiet: totalMealsOffDiet?.total,
+      bestOnDietSequence,
+    })
   })
 }
-
-// Obtém estatísticas
