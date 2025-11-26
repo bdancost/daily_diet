@@ -14,29 +14,6 @@ API para registro e acompanhamento de refeições dentro e fora da dieta, constr
 
 ---
 
-## ✨ Animação (shields flutuantes)
-
-<div align="center">
-  <style>
-    @keyframes float {
-      0%   { transform: translateY(0); }
-      50%  { transform: translateY(-7px); }
-      100% { transform: translateY(0); }
-    }
-    .shield-animada {
-      width: 130px;
-      margin: 8px;
-      animation: float 2.6s ease-in-out infinite;
-    }
-  </style>
-
-  <img class="shield-animada" alt="shield-node" src="https://img.shields.io/badge/Node.js-✔️-339933?style=flat-square" />
-  <img class="shield-animada" alt="shield-ts" src="https://img.shields.io/badge/TypeScript-✔️-3178C6?style=flat-square" />
-  <img class="shield-animada" alt="shield-fastify" src="https://img.shields.io/badge/Fastify-✔️-0058B0?style=flat-square" />
-</div>
-
----
-
 ## 📌 Resumo
 
 - API para **criação e controle de refeições**.
