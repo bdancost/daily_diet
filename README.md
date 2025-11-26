@@ -1,110 +1,78 @@
 # Daily Diet API
 
-<!-- Badges (shields) -->
+API para registro e acompanhamento de refeições dentro e fora da dieta, construída com **Fastify**, **TypeScript**, **Knex** e **SQLite/PostgreSQL**.
 
-<img alt="node" src="https://img.shields.io/badge/Node-ES2020-339933?logo=node.js&style=for-the-badge" /> <img alt="ts" src="https://img.shields.io/badge/TypeScript-ES2020-3178C6?logo=typescript&style=for-the-badge" /> <img alt="fastify" src="https://img.shields.io/badge/Fastify-Server-0058B0?logo=fastify&style=for-the-badge" /> <img alt="knex" src="https://img.shields.io/badge/Knex-Query-0F172A?logo=knex&style=for-the-badge" /> <img alt="sqlite" src="https://img.shields.io/badge/SQLite-DB-003B57?logo=sqlite&style=for-the-badge" />
+---
 
-<!-- "Animação" com ícones de shield (simples, via CSS inline; pode não animar em todos os renderizadores) -->
+## 🔧 Tecnologias
+
 <div align="center">
-  <style>
-    @keyframes float { 0% { transform: translateY(0) } 50% { transform: translateY(-6px) } 100% { transform: translateY(0) } }
-    .shield { width: 120px; margin: 6px; animation: float 2.5s ease-in-out infinite; }
-  </style>
-  <img class="shield" alt="shield-node" src="https://img.shields.io/badge/Node.js-✔️-339933?style=flat-square" />
-  <img class="shield" alt="shield-ts" src="https://img.shields.io/badge/TypeScript-✔️-3178C6?style=flat-square" />
-  <img class="shield" alt="shield-fastify" src="https://img.shields.io/badge/Fastify-✔️-0058B0?style=flat-square" />
+
+<img src="https://svg-banners.vercel.app/api?type=typeWriter&text1=Node.js%20💚&width=600&height=80" />
+
+<img src="https://svg-banners.vercel.app/api?type=typeWriter&text1=TypeScript%20🔵&width=600&height=80" />
+
+<img src="https://svg-banners.vercel.app/api?type=typeWriter&text1=Fastify%20⚡&width=600&height=80" />
+
 </div>
 
-Resumo curto
+---
 
-- API simples para registrar refeições (dentro/fora da dieta) com Fastify, Knex e SQLite/Postgres.
-- Código em TypeScript; saída compilada em `dist/`.
+## 📌 Resumo
 
-Visão geral do projeto
+- API para **criação e controle de refeições**.
+- Registro de refeições **dentro/fora da dieta**.
+- Autenticação via **cookie de sessão**.
+- Banco padrão: **SQLite**, opcional PostgreSQL.
+- Código em **TypeScript** com build para `dist/`.
 
-- Entrada: `src/server.ts`
-- Inicialização/Config: `src/app.ts`, `src/database.ts`, `knexfile.ts`
-- Rotas principais: `src/routes/users.ts`, `src/routes/meals.ts`
-- Middleware de sessão: `src/middlewares/check-session-id-exists.ts`
-- Migrations: `db/migrations/*`
-- Tipagens customizadas: `src/@types/*`
+---
 
-Requisitos
+## 🗂️ Estrutura do Projeto
 
-- Node 18+ (suporta ES2020)
-- npm
-- SQLite (por padrão) ou Postgres (opcional)
+- `src/server.ts`
+- `src/app.ts`
+- `src/routes/users.ts`
+- `src/routes/meals.ts`
+- `src/middlewares/check-session-id-exists.ts`
+- `db/migrations/*`
 
-Instalação / execução (rápido)
+---
 
-1. Instalar dependências:
+## 🚀 Instalação
 
 ```bash
 npm install
-```
-
-2. Criar arquivo `.env` (ex.: copiar de `.env.example` se existir) e ajustar:
-
-```env
-NODE_ENV=development
-DATABASE_CLIENT=sqlite
-DATABASE_URL=file:./dev.db
-PORT=3333
-```
-
-3. Rodar migrations:
-
-```bash
 npm run migrate:latest
-```
-
-4. Iniciar em modo dev:
-
-```bash
 npm run dev
 ```
 
-Scripts úteis (package.json)
+---
 
-- npm run dev — rodar em desenvolvimento (tsx watch)
-- npm run build — compilar TypeScript para `dist/`
-- npm run start — rodar build (node dist/server.js)
-- npm run knex — CLI do Knex via tsx
-- npm run migrate:make — criar nova migration
-- npm run migrate:latest — aplicar migrations
-- npm run migrate:rollback — reverter última migration
+## 📜 Scripts
 
-Banco de dados / Migrations
+| Script                     | Descrição                   |
+| -------------------------- | --------------------------- |
+| `npm run dev`              | Ambiente de desenvolvimento |
+| `npm run build`            | Compila para `dist/`        |
+| `npm run start`            | Executa build               |
+| `npm run knex`             | CLI do Knex                 |
+| `npm run migrate:make`     | Cria migration              |
+| `npm run migrate:latest`   | Aplica migrations           |
+| `npm run migrate:rollback` | Reverte última migration    |
 
-- Arquivos em `db/migrations/`
-- Arquivo helper do Knex: `db/knex.ts`
-- Use `DATABASE_CLIENT` (sqlite | pg) e `DATABASE_URL` para alternar entre SQLite e Postgres
+---
 
-Rotas principais (resumo)
-
-- Usuários
-  - Registro de usuário e criação de cookie de sessão
-  - Middleware associa `request.user` via cookie
-- Refeições
-  - CRUD de refeições (criar, listar, editar, excluir)
-  - Endpoints para métricas/resumo da dieta
-
-Testes
-
-- Configurar env de teste (`.env.test`) e rodar:
+## 🧪 Testes
 
 ```bash
 npm run test
 ```
 
-(Verifique `package.json` para o comando de testes; usa Vitest/tsx conforme o projeto)
+Usando **Vitest**.
 
-Observações rápidas
+---
 
-- Projeto com tipagem estrita (TS strict).
-- Arquivo `tsconfig.json` está configurado para target ES2020 e saída em `dist/`.
-- Badges acima usam shields.io para ícones/visualização.
+## 📄 Licença
 
-Contribuição
-
-- Abrir issue ou PR com descrição clara e testes quando aplicável.
+MIT License.
