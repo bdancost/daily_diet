@@ -8,3 +8,7 @@ app
   .then(() => {
     console.log('HTTP Server Running!')
   })
+  .catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
