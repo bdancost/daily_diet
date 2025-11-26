@@ -6,14 +6,33 @@ API para registro e acompanhamento de refeições dentro e fora da dieta, constr
 
 ## 🔧 Tecnologias
 
+<img alt="node" src="https://img.shields.io/badge/Node-ES2020-339933?logo=node.js&style=for-the-badge" />
+<img alt="ts" src="https://img.shields.io/badge/TypeScript-ES2020-3178C6?logo=typescript&style=for-the-badge" />
+<img alt="fastify" src="https://img.shields.io/badge/Fastify-Server-0058B0?logo=fastify&style=for-the-badge" />
+<img alt="knex" src="https://img.shields.io/badge/Knex-QueryBuilder-0F172A?logo=knex&style=for-the-badge" />
+<img alt="sqlite" src="https://img.shields.io/badge/SQLite-Database-003B57?logo=sqlite&style=for-the-badge" />
+
+---
+
+## ✨ Animação (shields flutuantes)
+
 <div align="center">
+  <style>
+    @keyframes float {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-7px); }
+      100% { transform: translateY(0); }
+    }
+    .shield-animada {
+      width: 130px;
+      margin: 8px;
+      animation: float 2.6s ease-in-out infinite;
+    }
+  </style>
 
-<img src="https://svg-banners.vercel.app/api?type=typeWriter&text1=Node.js%20💚&width=600&height=80" />
-
-<img src="https://svg-banners.vercel.app/api?type=typeWriter&text1=TypeScript%20🔵&width=600&height=80" />
-
-<img src="https://svg-banners.vercel.app/api?type=typeWriter&text1=Fastify%20⚡&width=600&height=80" />
-
+  <img class="shield-animada" alt="shield-node" src="https://img.shields.io/badge/Node.js-✔️-339933?style=flat-square" />
+  <img class="shield-animada" alt="shield-ts" src="https://img.shields.io/badge/TypeScript-✔️-3178C6?style=flat-square" />
+  <img class="shield-animada" alt="shield-fastify" src="https://img.shields.io/badge/Fastify-✔️-0058B0?style=flat-square" />
 </div>
 
 ---
@@ -21,28 +40,37 @@ API para registro e acompanhamento de refeições dentro e fora da dieta, constr
 ## 📌 Resumo
 
 - API para **criação e controle de refeições**.
-- Registro de refeições **dentro/fora da dieta**.
+- Registro de refeições “**dentro**” ou “**fora**” da dieta.
 - Autenticação via **cookie de sessão**.
-- Banco padrão: **SQLite**, opcional PostgreSQL.
+- Banco padrão: **SQLite** com opção para PostgreSQL.
 - Código em **TypeScript** com build para `dist/`.
 
 ---
 
 ## 🗂️ Estrutura do Projeto
 
-- `src/server.ts`
-- `src/app.ts`
-- `src/routes/users.ts`
-- `src/routes/meals.ts`
-- `src/middlewares/check-session-id-exists.ts`
-- `db/migrations/*`
+- **Entrada:** `src/server.ts`
+- **Configuração:** `src/app.ts`, `src/database.ts`, `knexfile.ts`
+- **Rotas:** `src/routes/users.ts`, `src/routes/meals.ts`
+- **Middleware:** `src/middlewares/check-session-id-exists.ts`
+- **Migrations:** `db/migrations/*`
+- **Tipagens:** `src/@types/*`
 
 ---
 
-## 🚀 Instalação
+## 📦 Requisitos
+
+- Node **18+**
+- npm
+- SQLite (default) ou PostgreSQL
+
+---
+
+## 🚀 Instalação e Execução
 
 ```bash
 npm install
+cp .env.example .env  # se existir
 npm run migrate:latest
 npm run dev
 ```
@@ -55,11 +83,35 @@ npm run dev
 | -------------------------- | --------------------------- |
 | `npm run dev`              | Ambiente de desenvolvimento |
 | `npm run build`            | Compila para `dist/`        |
-| `npm run start`            | Executa build               |
-| `npm run knex`             | CLI do Knex                 |
+| `npm run start`            | Executa versão compilada    |
+| `npm run knex`             | Acessa CLI do Knex          |
 | `npm run migrate:make`     | Cria migration              |
 | `npm run migrate:latest`   | Aplica migrations           |
 | `npm run migrate:rollback` | Reverte última migration    |
+
+---
+
+## 🗃️ Banco de Dados
+
+- Migrations em `db/migrations/`
+- Configuração em `db/knex.ts`
+- Alternância entre SQLite e Postgres via `.env`
+
+---
+
+## 🔌 Rotas
+
+### 👤 Usuários
+
+- Registro
+- Cookie de sessão
+- Middleware de autenticação leve
+
+### 🍽️ Refeições
+
+- CRUD
+- Marcação dentro/fora da dieta
+- Métricas: progresso, total, melhor sequência
 
 ---
 
@@ -73,6 +125,14 @@ Usando **Vitest**.
 
 ---
 
-## 📄 Licença
+## 📌 Observações
 
-MIT License.
+- Tipagem estrita (TS Strict)
+- Target ES2020
+- Output em `dist/`
+
+---
+
+## 🤝 Contribuição
+
+Issues e PRs são bem-vindos.
